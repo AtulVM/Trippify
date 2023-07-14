@@ -1,0 +1,66 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trippify-Split</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #333333;
+            color: rgb(255, 255, 255);
+        }
+        h1{
+            margin-top: 50px;
+            padding-top: 50px;
+        }
+        .back-link {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      text-decoration: none;
+    }
+        </style>
+</head>
+    <title>Split Bills</title>
+    <script>
+        function divideNumbers() {
+            // Get the input values
+            var dividend = parseFloat(document.getElementById("dividend").value);
+            var divisor = parseFloat(document.getElementById("divisor").value);
+
+            // Check if the divisor is not zero
+            if (divisor !== 0) {
+                // Perform division and display the result
+                var result = dividend / divisor;
+                document.getElementById("result").innerHTML = "Amount to be paid per person: ₹" + result;
+            } else {
+                // Display an error message if the divisor is zero
+                document.getElementById("result").innerHTML = "Error: Division by zero!";
+            }
+        }
+    </script>
+<body>
+    <a href="index.html" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#f2f2f2" width="24px" height="24px">
+          <path d="M0 0h24v24H0V0z" fill="none"/>
+          <path d="M14 7l-5 5 5 5V7z"/>
+        </svg>
+      </a>
+    <center>
+        
+    <h1>Split Bills</h1>
+
+    <input type="number" id="dividend" placeholder="Enter bill amount">
+    <br><br>
+    <input type="number" id="divisor" placeholder="Group count">
+    <br><br>
+    <button onclick="divideNumbers()">Split</button>
+    <p id="result"></p>
+</center>
+</body>
+</html>

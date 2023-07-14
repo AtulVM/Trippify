@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trippify-Documents</title>
+  <style>
+    body {
+      background-color: #333333;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      color: #ffffff;
+      padding: 10px;
+      margin: 0;
+      font-size: 24px;
+    }
+    #fileInput {
+      margin-bottom: 10px;
+    }
+    #previewContainer {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .filePreview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    .filePreview img,
+    .filePreview embed,
+    .filePreview canvas {
+      max-width: 100%;
+      max-height: 300px;
+      margin-bottom: 10px;
+    }
+    .removeButton {
+      background-color: #ff4444;
+      color: #ffffff;
+      border: none;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#f2f2f2" width="24px" height="24px">
+          <path d="M0 0h24v24H0V0z" fill="none"/>
+          <path d="M14 7l-5 5 5 5V7z"/>
+        </svg>
+      </a>
+  <h1>DOCUMENTS</h1>
+  <input type="file" id="fileInput" accept=".pdf, .jpg, .jpeg, .png" multiple />
+  <div id="previewContainer"></div>
+  <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const previewContainer = document.getElementById('previewContainer');
+    let pdfLoadingTask;
+    fileInput.addEventListener('change', handleFileSelect);
+    window.addEventListener('load', loadFilePreviews);
+    function handleFileSelect(event) {
+      const files = event.target.files;
+      if (files && files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            const fileContent = event.target.result;
+            const fileType = file.type;
+            displayFilePreview(fileType, fileContent);
+            saveFilePreview(fileType, fileContent);
+          }
+          reader.readAsDataURL(file);
+        }
+      }
+    }
+    function displayFilePreview(fileType, fileContent) {
+      const filePreview = document.createElement('div');
+      filePreview.classList.add('filePreview');
+
+      let previewElement;
+      if (fileType.includes('pdf')) {
+        previewElement = document.createElement('canvas');
+        filePreview.appendChild(previewElement);
+        renderPdfPreview(fileContent, previewElement);
+      } else if (fileType.includes('image')) {
+        previewElement = document.createElement('img');
+        previewElement.src = fileContent;
+        filePreview.appendChild(previewElement);
+      }
+
+      if (previewElement) {
+        previewContainer.appendChild(filePreview);
+      }
+
+      const removeButton = document.createElement('button');
+      removeButton.classList.add('removeButton');
+      removeButton.textContent = 'Remove';
+      removeButton.addEventListener('click', function() {
+        removeFilePreview(fileContent);
+        previewContainer.removeChild(filePreview);
+      });
+      filePreview.appendChild(removeButton);
+    }
+    function renderPdfPreview(fileContent, previewElement) {
+      const loadingTask = pdfjsLib.getDocument(fileContent);
+      pdfLoadingTask = loadingTask.promise;
+      pdfLoadingTask.then(function(pdf) {
+        const pageNumber = 1;
+        pdf.getPage(pageNumber).then(function(page) {
+          const viewport = page.getViewport({ scale: 1.0 });
+          const canvas = previewElement;
+          const context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          const renderContext = {
+            canvasContext: context,
+            viewport: viewport
+          };
+          page.render(renderContext);
+        });
+      });
+    }
+    function saveFilePreview(fileType, fileContent) {
+      let filePreviews = JSON.parse(localStorage.getItem('filePreviews')) || [];
+      filePreviews.push({ type: fileType, content: fileContent });
+      localStorage.setItem('filePreviews', JSON.stringify(filePreviews));
+    }
+    function loadFilePreviews() {
+      let filePreviews = JSON.parse(localStorage.getItem('filePreviews')) || [];
+      filePreviews.forEach(function(filePreview) {
+        displayFilePreview(filePreview.type, filePreview.content);
+      });
+    }
+    function removeFilePreview(fileContent) {
+      let filePreviews = JSON.parse(localStorage.getItem('filePreviews')) || [];
+      filePreviews = filePreviews.filter(function(filePreview) {
+        return filePreview.content !== fileContent;
+      });
+      localStorage.setItem('filePreviews', JSON.stringify(filePreviews));
+    }
+  </script>
+</body>
+</html>

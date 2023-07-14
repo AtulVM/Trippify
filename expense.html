@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trippify-EM</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #333333;
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .form-container {
+      max-width: 400px;
+      margin: 20px auto;
+      background-color: #444444;
+      padding: 20px;
+      border-radius: 5px;
+    }
+
+    .form-container input[type="text"],
+    .form-container input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: none;
+      border-bottom: 1px solid #ffffff;
+      background-color: #444444;
+      color: white;
+    }
+
+    .form-container button {
+      background-color: #ffffff;
+      color: #0e0a19;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table th,
+    table td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ffffff;
+    }
+
+    table th {
+      background-color: #f2f2f2;
+      color: #333333;
+    }
+
+    .total-expenditure {
+      margin-top: 20px;
+      text-align: right;
+      font-weight: bold;
+    }
+    .back-link {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      text-decoration: none;
+    }
+
+    .delete-button {
+      background-color: #ff0000;
+      color: #ffffff;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    @media only screen and (max-width: 600px) {
+      .form-container {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+    <a href="index.html" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#f2f2f2" width="24px" height="24px">
+          <path d="M0 0h24v24H0V0z" fill="none"/>
+          <path d="M14 7l-5 5 5 5V7z"/>
+        </svg>
+      </a>
+  <h1>EXPENSES</h1>
+  <div class="form-container">
+    <form id="expenseForm">
+      <label for="itemName">Item Name:</label>
+      <input type="text" id="itemName" required>
+      <label for="itemPrice">Item Price:</label>
+      <input type="number" id="itemPrice" required>
+      <button type="submit">Add Expense</button>
+    </form>
+  </div>
+
+  <table id="expenseTable"></table>
+
+  <div class="total-expenditure" id="totalExpenditure"></div>
+
+  <script>
+    // Retrieve saved expenses from local storage or initialize an empty array
+    const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+    // Function to render the table with expenses
+    function renderTable() {
+      const expenseTable = document.getElementById('expenseTable');
+
+      // Clear existing table rows
+      expenseTable.innerHTML = '';
+
+      // Create table header
+      const tableHeader = document.createElement('tr');
+      tableHeader.innerHTML = '<th>Item Name</th><th>Item Price</th><th></th>';
+      expenseTable.appendChild(tableHeader);
+
+      // Create table rows with expense data
+      for (let i = 0; i < expenses.length; i++) {
+        const expense = expenses[i];
+        const tableRow = document.createElement('tr');
+        tableRow.innerHTML = `<td>${expense.name}</td><td>${expense.price}</td><td><button class="delete-button" onclick="deleteExpense(${i})">Remove</button></td>`;
+        expenseTable.appendChild(tableRow);
+      }
+
+      // Calculate and display total expenditure
+      const totalExpenditure = document.getElementById('totalExpenditure');
+      const total = expenses.reduce((sum, expense) => sum + expense.price, 0);
+      totalExpenditure.textContent = `The total expenditure is ₹: ${total}`;
+
+      // Save the updated expenses in local storage
+      localStorage.setItem('expenses', JSON.stringify(expenses));
+    }
+
+    // Function to delete an expense from the table and update the total expenditure
+    function deleteExpense(index) {
+      expenses.splice(index, 1);
+      renderTable();
+    }
+
+    // Handle form submission
+    const expenseForm = document.getElementById('expenseForm');
+    expenseForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      const itemName = document.getElementById('itemName').value;
+      const itemPrice = parseInt(document.getElementById('itemPrice').value);
+
+      if (itemName && itemPrice) {
+        expenses.push({ name: itemName, price: itemPrice });
+        renderTable();
+        expenseForm.reset();
+      }
+    });
+
+    // Render the table on page load
+    renderTable();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Trippify-Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #333333;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-top: 20px;
+      color: #ffffff;
+    }
+    .back-link {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      text-decoration: none;
+    }
+
+    form {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      color: #ffffff;
+      margin-right: 10px;
+    }
+
+    input[type="text"] {
+      padding: 5px;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    button[type="submit"] {
+      background-color: #ffffff;
+      color: #0e0a19;
+      border: none;
+      padding: 8px 20px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    #map {
+      height: 400px;
+      width: 100%;
+      max-width: 100%;
+      margin-top: 20px;
+    }
+
+  </style>
+</head>
+
+<body>
+    <a href="index.html" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#f2f2f2" width="24px" height="24px">
+          <path d="M0 0h24v24H0V0z" fill="none"/>
+          <path d="M14 7l-5 5 5 5V7z"/>
+        </svg>
+      </a>
+  <div class="container">
+    <h1>MAP</h1>
+    <form onsubmit="displayMap(event)">
+      <label for="location">Enter Destination:</label>
+      <br><br>
+      <input type="text" id="location" required>
+      <br>
+      <button type="submit">Explore!</button>
+    </form>
+    <div id="map"></div>
+  </div>
+
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYW1heW5vbiIsImEiOiJjbGloeGN0d2cwZmFhM2RwaW1lOW1ydzJ6In0.lQ3DET7-qVir4AoD1zElMg';
+
+    function displayMap(event) {
+      event.preventDefault();
+      const location = document.getElementById('location').value;
+
+      fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?access_token=${mapboxgl.accessToken}`)
+        .then(response => response.json())
+        .then(data => {
+          const coordinates = data.features[0].center;
+
+          const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: coordinates,
+            zoom: 12
+          });
+
+          new mapboxgl.Marker()
+            .setLngLat(coordinates)
+            .addTo(map);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+  </script>
+</body>
+
+</html>

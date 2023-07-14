@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrippifyLocation</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      background-color: #333333;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    #address {
+      margin-bottom: 10px;
+    }
+
+    #map {
+      height: 400px;
+      margin-bottom: 20px;
+    }
+
+    .error {
+      color: #ff0000;
+    }
+    .back-link {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+    <a href="index.html" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#f2f2f2" width="24px" height="24px">
+          <path d="M0 0h24v24H0V0z" fill="none"/>
+          <path d="M14 7l-5 5 5 5V7z"/>
+        </svg>
+      </a>
+  <h1>MY LOCATION</h1>
+
+  <form id="locationForm">
+    <button type="button" onclick="getLocation()">Get Location</button>
+  </form>
+
+  <div id="address"></div>
+
+  <div id="map"></div>
+
+  <script>
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(getAddress, showError);
+      } else {
+        showError({ message: "Geolocation is not supported by this browser." });
+      }
+    }
+
+    function getAddress(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const apiKey = "pk.435b1cc7bdcd136df17056d368f6987b"; // Replace with your LocationIQ API key
+
+      const url = `https://us1.locationiq.com/v1/reverse.php?key=${apiKey}&lat=${lat}&lon=${lon}&format=json`;
+
+      axios.get(url)
+        .then(function (response) {
+          const data = response.data;
+          const address = data.display_name;
+
+          document.getElementById("address").textContent = address;
+
+          // Display map using Mapbox GL JS
+          mapboxgl.accessToken = 'pk.eyJ1IjoiYW1heW5vbiIsImEiOiJjbGloeGN0d2cwZmFhM2RwaW1lOW1ydzJ6In0.lQ3DET7-qVir4AoD1zElMg'; // Replace with your Mapbox access token
+
+          const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [lon, lat],
+            zoom: 14
+          });
+
+          new mapboxgl.Marker()
+            .setLngLat([lon, lat])
+            .addTo(map);
+        })
+        .catch(function (error) {
+          showError({ message: "Failed to fetch address." });
+        });
+    }
+
+    function showError(error) {
+      const errorMessage = error.message || "An error occurred.";
+      document.getElementById("address").textContent = "";
+      document.getElementById("map").textContent = "";
+      const errorDiv = document.createElement("div");
+      errorDiv.className = "error";
+      errorDiv.textContent = errorMessage;
+      document.body.appendChild(errorDiv);
+    }
+  </script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
+</body>
+
+</html>

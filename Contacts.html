@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact List</title>
+  <style>
+    body {
+      background-color: #333333;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ffffff;
+    }
+
+    .remove-contact {
+      cursor: pointer;
+      color: #ff0000;
+    }
+    .back-link {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<a href="index.html" class="back-link">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#f2f2f2" width="24px" height="24px">
+    <path d="M0 0h24v24H0V0z" fill="none"/>
+    <path d="M14 7l-5 5 5 5V7z"/>
+  </svg>
+</a>
+<body>
+  <h1>Contact List</h1>
+
+  <form id="addContactForm">
+    <label for="nameInput">Name:</label>
+    <input type="text" id="nameInput" required>
+    <br><br>
+    <label for="phoneInput">Phone Number:</label>
+    <input type="tel" id="phoneInput" required>
+    <br><br>
+    <label for="emailInput">Email (optional):</label>
+    <input type="email" id="emailInput">
+    <br><br>
+    <button type="submit">Add Contact</button>
+  </form>
+
+  <table id="contactTable">
+    <tr>
+      <th>Name</th>
+      <th>Phone Number</th>
+      <th>Email</th>
+      <th></th>
+    </tr>
+    <!-- Contact entries will be dynamically added here -->
+  </table>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const addContactForm = document.getElementById("addContactForm");
+      const nameInput = document.getElementById("nameInput");
+      const phoneInput = document.getElementById("phoneInput");
+      const emailInput = document.getElementById("emailInput");
+      const contactTable = document.getElementById("contactTable");
+
+      // Load contacts from local storage
+      let savedContacts = JSON.parse(localStorage.getItem("contacts")) || [];
+
+      // Render contacts
+      savedContacts.forEach(function (contact) {
+        createContactEntry(contact);
+      });
+
+      function createContactEntry(contact) {
+        const row = contactTable.insertRow();
+        const nameCell = row.insertCell();
+        const phoneCell = row.insertCell();
+        const emailCell = row.insertCell();
+        const removeCell = row.insertCell();
+
+        nameCell.textContent = contact.name;
+        phoneCell.textContent = contact.phone;
+        emailCell.textContent = contact.email || "-";
+
+        const removeBtn = document.createElement("span");
+        removeBtn.className = "remove-contact";
+        removeBtn.innerHTML = "&#10006;";
+        removeBtn.addEventListener("click", function () {
+          row.remove();
+          savedContacts = savedContacts.filter(function (item) {
+            return item.name !== contact.name && item.phone !== contact.phone;
+          });
+          saveContacts();
+        });
+
+        removeCell.appendChild(removeBtn);
+      }
+
+      function saveContacts() {
+        localStorage.setItem("contacts", JSON.stringify(savedContacts));
+      }
+
+      addContactForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const name = nameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        const email = emailInput.value.trim();
+
+        if (name && phone) {
+          const contact = {
+            name: name,
+            phone: phone,
+            email: email
+          };
+          savedContacts.push(contact);
+          createContactEntry(contact);
+          saveContacts();
+
+          nameInput.value = "";
+          phoneInput.value = "";
+          emailInput.value = "";
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

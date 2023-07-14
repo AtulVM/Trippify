@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trippify-Weather</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+        text-align: center;
+        font-family: Arial, sans-serif;
+        background-color: #333333;
+        color: rgb(255, 255, 255);
+    }
+    h1{
+        margin-top: 50px;
+        padding-top: 50px;
+    }
+    .back-link {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      text-decoration: none;
+    }
+    </style>
+</head>
+<a href="index.html" class="back-link">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#f2f2f2" width="24px" height="24px">
+      <path d="M0 0h24v24H0V0z" fill="none"/>
+      <path d="M14 7l-5 5 5 5V7z"/>
+    </svg>
+  </a>
+<body>
+    <h1>Weather</h1>
+    <label for="location">Enter Destination:</label><br><br>
+    <input type="text" id="location" placeholder="Enter a location"><br><br>
+    <button onclick="getWeather()">Get Weather</button>
+  
+    <div id="weather-info"></div>
+  
+    <script>
+      function getWeather() {
+        var location = document.getElementById('location').value;
+        var apiKey = 'a8452c776ec89b2205157ba7bff20a11'; // Replace with your Weatherstack API key
+  
+        $.ajax({
+          url: `http://api.weatherstack.com/current?access_key=${apiKey}&query=${location}`,
+          method: 'GET',
+          success: function(response) {
+            var weatherInfo = document.getElementById('weather-info');
+            weatherInfo.innerHTML = `
+              <h2>${response.location.name}</h2>
+              <p>Temperature: ${response.current.temperature}°C</p>
+              <p>Weather Description: ${response.current.weather_descriptions[0]}</p>
+            `;
+          },
+          error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+  </script>
+</body>
+</html>

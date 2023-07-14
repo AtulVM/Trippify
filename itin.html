@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trippify-Schedule</title>
+  <style>
+    body {
+      background-color: #333333;
+      color: #f2f2f2;
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+  
+    form {
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #444444;
+      border-radius: 8px;
+    }
+
+    form label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    form input[type="text"],
+    form input[type="date"],
+    form input[type="time"] {
+      padding: 6px;
+      width: 100%;
+      box-sizing: border-box;
+      border: none;
+      background-color: #f2f2f2;
+      color: #333333;
+    }
+
+    form input[type="submit"] {
+      padding: 6px 12px;
+      background-color: #4caf50;
+      color: #f2f2f2;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background-color: #444444;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #f2f2f2;
+    }
+
+    th {
+      background-color: #333333;
+    }
+
+    .remove-btn {
+      padding: 4px 4px;
+      background-color: #f44336;
+      color: #f2f2f2;
+      border: none;
+      cursor: pointer;
+    }
+   
+    @media screen and (max-width: 600px) {
+      form {
+        max-width: 100%;
+        margin: 20px;
+      }
+
+      table {
+        margin: 20px;
+        font-size: 14px;
+      }
+    }
+
+    @media screen and (max-width: 400px) {
+      table {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#f2f2f2" width="24px" height="24px">
+          <path d="M0 0h24v24H0V0z" fill="none"/>
+          <path d="M14 7l-5 5 5 5V7z"/>
+        </svg>
+      </a>
+    <h1>SCHEDULE</h1>
+    <form id="activityForm">
+      <label for="location">Location:</label>
+      <input type="text" id="location" required><br><br>
+      <label for="activity">Activity:</label>
+      <input type="text" id="activity" required><br><br>
+      <label for="date">Date:</label>
+      <input type="date" id="date" required><br><br>
+      <label for="time">Time:</label>
+      <input type="time" id="time" required><br>
+      <input type="submit" value="Add Activity">
+    </form>
+    
+    <table id="activityTable">
+      <thead>
+        <tr>
+          <th>Location</th>
+          <th>Activity</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  
+  <script>
+    const form = document.getElementById('activityForm');
+    const table = document.getElementById('activityTable').getElementsByTagName('tbody')[0];
+
+    window.addEventListener('load', () => {
+      const activities = JSON.parse(localStorage.getItem('activities')) || [];
+      populateTable(activities);
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const locationInput = document.getElementById('location');
+      const activityInput = document.getElementById('activity');
+      const dateInput = document.getElementById('date');
+      const timeInput = document.getElementById('time');
+
+      const location = locationInput.value;
+      const activity = activityInput.value;
+      const date = dateInput.value;
+      const time = timeInput.value;
+
+      const newActivity = { location, activity, date, time };
+
+      const activities = JSON.parse(localStorage.getItem('activities')) || [];
+
+      activities.push(newActivity);
+
+      localStorage.setItem('activities', JSON.stringify(activities));
+
+      locationInput.value = '';
+      activityInput.value = '';
+      dateInput.value = '';
+      timeInput.value = '';
+
+      populateTable(activities);
+    });
+
+    function populateTable(activities) {
+      table.innerHTML = '';
+
+      activities.forEach((activity, index) => {
+        const row = table.insertRow();
+
+        const locationCell = row.insertCell();
+        const activityCell = row.insertCell();
+        const dateCell = row.insertCell();
+        const timeCell = row.insertCell();
+        const removeCell = row.insertCell();
+
+        locationCell.textContent = activity.location;
+        activityCell.textContent = activity.activity;
+        dateCell.textContent = activity.date;
+        timeCell.textContent = activity.time;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.classList.add('remove-btn');
+        removeBtn.textContent = 'Clear';
+        removeBtn.addEventListener('click', () => {
+          removeActivity(index);
+        });
+        removeCell.appendChild(removeBtn);
+      });
+    }
+
+    function removeActivity(index) {
+      const activities = JSON.parse(localStorage.getItem('activities')) || [];
+
+      activities.splice(index, 1);
+
+      localStorage.setItem('activities', JSON.stringify(activities));
+
+      populateTable(activities);
+    }
+  </script>
+</body>
+</html>

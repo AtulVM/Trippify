@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrippifyChecklist</title>
+  <style>
+    body {
+      background-color: #333333;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    label {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 10px;
+    }
+
+    .remove-item {
+      cursor: pointer;
+      color: #ff0000;
+      margin-left: 10px;
+    }
+    .back-link {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <a href="index.html" class="back-link">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#f2f2f2" width="24px" height="24px">
+      <path d="M0 0h24v24H0V0z" fill="none"/>
+      <path d="M14 7l-5 5 5 5V7z"/>
+    </svg>
+  </a>
+  <h1>CHECK LIST</h1>
+
+  <form id="addItemForm">
+    <label for="itemInput">Item:</label>
+    <input type="text" id="itemInput" required>
+    <button type="submit">Add</button>
+  </form>
+
+  <ul id="checklist">
+    <!-- Checklist items will be dynamically added here -->
+  </ul>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const addItemForm = document.getElementById("addItemForm");
+      const itemInput = document.getElementById("itemInput");
+      const checklist = document.getElementById("checklist");
+
+      // Load checklist items from local storage
+      let savedItems = JSON.parse(localStorage.getItem("checklistItems")) || [];
+
+      // Render checklist items
+      savedItems.forEach(function (item) {
+        createChecklistItem(item);
+      });
+
+      function createChecklistItem(itemText) {
+        const listItem = document.createElement("li");
+        const checkbox = document.createElement("input");
+        const label = document.createElement("label");
+        const removeBtn = document.createElement("span");
+
+        checkbox.type = "checkbox";
+        checkbox.checked = itemText.checked || false;
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(itemText.text));
+
+        listItem.appendChild(label);
+
+        removeBtn.className = "remove-item";
+        removeBtn.innerHTML = "&#10006;";
+        removeBtn.addEventListener("click", function () {
+          listItem.remove();
+          savedItems = savedItems.filter(function (item) {
+            return item.text !== itemText.text;
+          });
+          saveChecklistItems();
+        });
+
+        listItem.appendChild(removeBtn);
+        checklist.appendChild(listItem);
+      }
+
+      function saveChecklistItems() {
+        localStorage.setItem("checklistItems", JSON.stringify(savedItems));
+      }
+
+      addItemForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const itemText = itemInput.value.trim();
+
+        if (itemText !== "") {
+          if (!savedItems.some((item) => item.text === itemText)) {
+            const newItem = { text: itemText, checked: false };
+            savedItems.push(newItem);
+            createChecklistItem(newItem);
+            saveChecklistItems();
+          }
+          itemInput.value = "";
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
